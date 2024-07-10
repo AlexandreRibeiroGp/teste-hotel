@@ -1,0 +1,71 @@
+CREATE TABLE usuarios (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    senha VARCHAR(255) NOT NULL
+);
+
+-- Criação da tabela de hotéis
+CREATE TABLE hotels (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    localizacao VARCHAR(255) NOT NULL,
+    preco_por_noite DECIMAL(10, 2) NOT NULL,
+    numero_quartos_disponiveis INTEGER NOT NULL,
+    numero_hospedes INTEGER NOT NULL,
+    check_in_date DATE NOT NULL,
+    check_out_date DATE NOT NULL
+);
+
+-- Criação da tabela de comodidades dos hotéis
+CREATE TABLE hotel_comodidades (
+    hotel_id INTEGER NOT NULL,
+    comodidade VARCHAR(255) NOT NULL,
+    FOREIGN KEY (hotel_id) REFERENCES hotels(id) ON DELETE CASCADE
+);
+
+-- Criação da tabela de avaliações
+CREATE TABLE avaliacoes (
+    id SERIAL PRIMARY KEY,
+    nota INTEGER NOT NULL,
+    comentario TEXT,
+    hotel_id INTEGER NOT NULL,
+    usuario_id INTEGER NOT NULL,
+    FOREIGN KEY (hotel_id) REFERENCES hotels(id) ON DELETE CASCADE,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+CREATE TABLE reservas (
+    id SERIAL PRIMARY KEY,
+    hotel_id INTEGER NOT NULL,
+    usuario_id INTEGER NOT NULL,
+    check_in_date DATE,
+    check_out_date DATE,
+    numero_quartos INTEGER,
+    numero_hospedes INTEGER,
+    status VARCHAR(50),
+    FOREIGN KEY (hotel_id) REFERENCES hotels(id) ON DELETE CASCADE,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE notificacoes (
+    id SERIAL PRIMARY KEY,
+    reserva_id INTEGER NOT NULL,
+    message TEXT NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    data_envio TIMESTAMP NOT NULL,
+    FOREIGN KEY (reserva_id) REFERENCES reservas(id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE pagamento (
+    id SERIAL PRIMARY KEY,
+    metodo_pagamento VARCHAR(50) NOT NULL,
+    valor_pago DECIMAL(10, 2) NOT NULL,
+    status_pagamento VARCHAR(50) NOT NULL
+);
+
+
+ALTER TABLE reserva ADD COLUMN pagamento_id BIGINT;
+ALTER TABLE reserva ADD CONSTRAINT fk_reserva_pagamento FOREIGN KEY (pagamento_id) REFERENCES pagamento(id);
